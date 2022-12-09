@@ -1,0 +1,39 @@
+version: "3.3"
+services:
+  db:
+    image: mysql:5.7.22
+    container_name: db
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: car_app
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    expose:
+      - 3308
+    volumes:
+      - .:/app
+
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: gunicorn --bind 0.0.0.0:8000 app:app --timeout 400
+    environment:
+      - SQLALCHEMY_DATABASE_URI=mysql+mysqldb://root:root@db:8000/car_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    restart: always
+
+
+
+
+
+
+
